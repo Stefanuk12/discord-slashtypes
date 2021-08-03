@@ -3,7 +3,7 @@ import { REST } from '@discordjs/rest';
 import { Routes } from 'discord-api-types/v9';
 
 //
-export namespace Commands {
+namespace Commands {
     /**
         * Refreshes all of your (/) commands, making them appear in Discord
         * @param token The token of your bot
@@ -33,7 +33,7 @@ export namespace Commands {
     /**
         * All of the types of options
     */
-    enum OptionType {
+    export enum OptionType {
         SUB_COMMAND = 1,
         SUB_COMMAND_GROUP = 2,
         STRING = 3,
@@ -47,14 +47,14 @@ export namespace Commands {
     }
 
     // Choices
-    interface IChoice {
+    export interface IChoice {
         name: string
         value: string
     }
     /**
         * Represents a Choice
     */
-    class Choice {
+    export class Choice {
         // Vars
         name: string
         value: string
@@ -81,7 +81,7 @@ export namespace Commands {
     }
 
     // Options
-    interface IOption {
+    export interface IOption {
         name: string
         description: string
         type: OptionType
@@ -92,7 +92,7 @@ export namespace Commands {
     /**
         * Represents an Option
     */
-    class Option {
+    export class Option {
         // Vars
         name: string
         description: string
@@ -207,7 +207,7 @@ export namespace Commands {
     }
 
     // SubCommand
-    interface ISubCommand {
+    export interface ISubCommand {
         name: string
         description?: string
         options?: Option[]
@@ -215,7 +215,7 @@ export namespace Commands {
     /**
         * Represents a Sub Command
     */
-    class SubCommand {
+    export class SubCommand {
         // Vars
         name: string
         description?: string
@@ -283,7 +283,7 @@ export namespace Commands {
     }
 
     // Slash
-    interface ISlash {
+    export interface ISlash {
         name: string
         description?: string
         options?: (Option | SubCommand | SubCommandGroup)[]
@@ -291,7 +291,7 @@ export namespace Commands {
     /**
         * Represents a Slash Command
     */
-    class Slash {
+    export class Slash {
         // Vars
         name: string
         description?: string
@@ -412,12 +412,15 @@ export namespace Commands {
     }
 
     // SubCommandGroup
-    interface ISubCommandGroup extends ISlash {}
+    export interface ISubCommandGroup extends ISlash {}
 
     /**
         * Represents a Sub Command Group
     */
-    class SubCommandGroup extends Slash {
+    export class SubCommandGroup extends Slash {
         readonly type: number = OptionType.SUB_COMMAND_GROUP
     }
 }
+
+// Export
+module.exports = Commands

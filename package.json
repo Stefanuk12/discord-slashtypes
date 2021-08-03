@@ -1,0 +1,32 @@
+{
+  "name": "discord-slashtypes",
+  "version": "1.0.0",
+  "description": "Includes typings for discord.js v13 slash commands.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Stefanuk12/discord-slashtypes.git"
+  },
+  "keywords": [
+    "discord",
+    "discord.js",
+    "bot",
+    "slash",
+    "command",
+    "commands",
+    "types"
+  ],
+  "author": "Stefanuk12",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Stefanuk12/discord-slashtypes/issues"
+  },
+  "homepage": "https://github.com/Stefanuk12/discord-slashtypes#readme",
+  "dependencies": {
+    "@discordjs/rest": "^0.1.0-canary.0",
+    "discord-api-types": "^0.22.0"
+  }
+}

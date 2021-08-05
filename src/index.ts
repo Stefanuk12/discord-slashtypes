@@ -171,7 +171,7 @@ export class Option {
     /**
         * Add an option to the pre-existing options
     */
-    addOption(data: Option | Discord.ApplicationCommandOptionData) {
+    addOption(data: Option | Discord.ApplicationCommandOptionData, returnOption: boolean = false) {
         // Make sure there is an option array
         if (!this.options) {
             this.options = []
@@ -185,14 +185,21 @@ export class Option {
             option = data
         }
 
-        // Push
+        // Add an option
         this.options.push(option)
+
+        // Return
+        if (returnOption){
+            return option
+        } else {
+            return this
+        }
     }
 
     /**
         * Add a choice to the pre-existing choices
     */
-    addChoice(data: Choice | Discord.ApplicationCommandOptionChoice) {
+    addChoice(data: Choice | Discord.ApplicationCommandOptionChoice, returnChoice: boolean = false) {
         // Make sure there is a choice array
         if (!this.choices) {
             this.choices = []
@@ -209,8 +216,12 @@ export class Option {
         // Add a choice
         this.choices.push(choice)
 
-        // Return the choice
-        return choice
+        // Return
+        if (returnChoice){
+            return choice
+        } else {
+            return this
+        }
     }
 }
 
@@ -262,7 +273,7 @@ export class SubCommand {
     /**
         * Add an option to the existing options of the Sub Command
     */
-    addOption(data: Option | Discord.ApplicationCommandOptionData) {
+    addOption(data: Option | Discord.ApplicationCommandOptionData, returnOption: boolean = false) {
         // Make sure there is an option array
         if (!this.options) {
             this.options = []
@@ -279,8 +290,12 @@ export class SubCommand {
         // Add an option
         this.options.push(option)
 
-        // Return the option
-        return option
+        // Return
+        if (returnOption){
+            return option
+        } else {
+            return this
+        }
     }
 }
 
@@ -339,7 +354,7 @@ export default class Slash {
     /**
         * Adds an options to the existing options of the Slash Command
     */
-    addOption(data: Option | Discord.ApplicationCommandOptionData) {
+    addOption(data: Option | Discord.ApplicationCommandOptionData, returnOption: boolean = false) {
         // Make sure there is an option array
         if (!this.options) {
             this.options = []
@@ -356,8 +371,12 @@ export default class Slash {
         // Add an option
         this.options.push(option)
 
-        // Return the option
-        return option
+        // Return
+        if (returnOption){
+            return option
+        } else {
+            return this
+        }
     }
 
     /**

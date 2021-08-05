@@ -78,11 +78,11 @@ export declare class Option {
     /**
         * Add an option to the pre-existing options
     */
-    addOption(data: Option | Discord.ApplicationCommandOptionData): void;
+    addOption(data: Option | Discord.ApplicationCommandOptionData, returnOption?: boolean): Option;
     /**
         * Add a choice to the pre-existing choices
     */
-    addChoice(data: Choice | Discord.ApplicationCommandOptionChoice): Choice;
+    addChoice(data: Choice | Discord.ApplicationCommandOptionChoice, returnChoice?: boolean): Choice | this;
 }
 /**
     * Represents a Sub Command
@@ -108,7 +108,7 @@ export declare class SubCommand {
     /**
         * Add an option to the existing options of the Sub Command
     */
-    addOption(data: Option | Discord.ApplicationCommandOptionData): Option;
+    addOption(data: Option | Discord.ApplicationCommandOptionData, returnOption?: boolean): Option | this;
 }
 /**
     * Represents a Slash Command
@@ -134,7 +134,7 @@ export default class Slash {
     /**
         * Adds an options to the existing options of the Slash Command
     */
-    addOption(data: Option | Discord.ApplicationCommandOptionData): Option;
+    addOption(data: Option | Discord.ApplicationCommandOptionData, returnOption?: boolean): this | Option;
     /**
         * Creates a Sub Command Group and adds it to the Slash Command
     */

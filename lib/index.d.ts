@@ -1,5 +1,16 @@
 import Discord, { ApplicationCommandOptionType, Snowflake } from "discord.js";
-import { ApplicationCommandOptionTypes } from "discord.js/typings/enums";
+export declare enum ApplicationCommandOptionTypes {
+    SUB_COMMAND = 1,
+    SUB_COMMAND_GROUP = 2,
+    STRING = 3,
+    INTEGER = 4,
+    BOOLEAN = 5,
+    USER = 6,
+    CHANNEL = 7,
+    ROLE = 8,
+    MENTIONABLE = 9,
+    NUMBER = 10
+}
 export import OptionType = ApplicationCommandOptionTypes;
 /**
     * Removes all the registered slash commands. Make sure your bot is ready first

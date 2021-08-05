@@ -1,37 +1,24 @@
+import Discord, { ApplicationCommandOptionType, Snowflake } from "discord.js";
+import { ApplicationCommandOptionTypes } from "discord.js/typings/enums";
+/**
+    * Removes all the registered slash commands. Make sure your bot is ready first
+    * @param {Discord.Client} Client - Your bot client
+*/
+export declare function removeAllSlashCommands(Client: Discord.Client, guildId?: string): Promise<void>;
 /**
     * Refreshes all of your (/) commands, making them appear in Discord
-    * @param token The token of your bot
-    * @param clientId The Client Id of your bot
-    * @param guildId The Guild Id of where you want your commands to appear
-    * @param allSlashCommands An array with all of the slash commands
+    * @param {Discord.Client} Client - Your bot client
+    * @param {Slash[]} allSlashCommands - An array with all of the slash commands
+    * @param {Snowflake} guildId - The guild id you only want to initialise these commands in
 */
-export declare function initialise(token: string, clientId: string, guildId: string, allSlashCommands: Slash[]): Promise<void>;
-/**
-    * All of the types of options
-*/
-export declare enum OptionType {
-    SUB_COMMAND = 1,
-    SUB_COMMAND_GROUP = 2,
-    STRING = 3,
-    INTEGER = 4,
-    BOOLEAN = 5,
-    USER = 6,
-    CHANNEL = 7,
-    ROLE = 8,
-    MENTIONABLE = 9,
-    NUMBER = 10
-}
-export interface IChoice {
-    name: string;
-    value: string;
-}
+export declare function initialise(Client: Discord.Client, allSlashCommands: Slash[], guildId?: Snowflake): Promise<void>;
 /**
     * Represents a Choice
 */
 export declare class Choice {
     name: string;
-    value: string;
-    constructor(data: IChoice);
+    value: string | number;
+    constructor(data: Discord.ApplicationCommandOptionChoice);
     /**
         * Set the name of the Choice
     */
@@ -41,25 +28,17 @@ export declare class Choice {
     */
     setValue(value: string): void;
 }
-export interface IOption {
-    name: string;
-    description: string;
-    type: OptionType;
-    required?: boolean;
-    choices?: Choice[];
-    options?: IOption[];
-}
 /**
     * Represents an Option
 */
 export declare class Option {
     name: string;
     description: string;
-    type: OptionType;
+    type: ApplicationCommandOptionType | ApplicationCommandOptionTypes;
     required?: boolean;
     choices?: Choice[];
     options?: Option[];
-    constructor(data: IOption);
+    constructor(data: Discord.ApplicationCommandOptionData);
     /**
         * Set the name of the Option
     */
@@ -71,7 +50,7 @@ export declare class Option {
     /**
         * Set the type of the Option
     */
-    setType(type: OptionType): void;
+    setType(type: ApplicationCommandOptionTypes): void;
     /**
         * Set whether the option is required
     */
@@ -87,26 +66,21 @@ export declare class Option {
     /**
         * Add an option to the pre-existing options
     */
-    addOption(data: Option | IOption): void;
+    addOption(data: Option | Discord.ApplicationCommandOptionData): void;
     /**
         * Add a choice to the pre-existing choices
     */
-    addChoice(data: Choice | IChoice): Choice;
-}
-export interface ISubCommand {
-    name: string;
-    description?: string;
-    options?: Option[];
+    addChoice(data: Choice | Discord.ApplicationCommandOptionChoice): Choice;
 }
 /**
     * Represents a Sub Command
 */
 export declare class SubCommand {
     name: string;
-    description?: string;
-    readonly type: OptionType;
+    description: string;
+    readonly type: ApplicationCommandOptionTypes;
     options?: (Option)[];
-    constructor(data: ISubCommand);
+    constructor(data: Discord.ApplicationCommandData);
     /**
         * Sets the name of the Sub Command
     */
@@ -122,21 +96,17 @@ export declare class SubCommand {
     /**
         * Add an option to the existing options of the Sub Command
     */
-    addOption(data: Option | IOption): Option;
-}
-export interface ISlash {
-    name: string;
-    description?: string;
-    options?: (Option | SubCommand | SubCommandGroup)[];
+    addOption(data: Option | Discord.ApplicationCommandOptionData): Option;
 }
 /**
     * Represents a Slash Command
 */
 export default class Slash {
     name: string;
-    description?: string;
-    options?: (Option | SubCommand | SubCommandGroup)[];
-    constructor(data: ISlash);
+    description: string;
+    options?: (Discord.ApplicationCommandOptionData)[];
+    defaultPermissions?: boolean;
+    constructor(data: Discord.ApplicationCommandData);
     /**
         * Sets the name of the Slash Command
     */
@@ -152,21 +122,26 @@ export default class Slash {
     /**
         * Adds an options to the existing options of the Slash Command
     */
-    addOption(data: Option | IOption): Option;
+    addOption(data: Option | Discord.ApplicationCommandOptionData): Option;
     /**
         * Creates a Sub Command Group and adds it to the Slash Command
     */
-    addSubCommandGroup(data: SubCommandGroup | ISubCommandGroup): SubCommandGroup;
+    addSubCommandGroup(data: SubCommandGroup | Discord.ApplicationCommandData): SubCommandGroup;
     /**
         * Creates a Sub Command and adds it to the Slash Command
     */
-    addSubCommand(data: SubCommand | ISubCommand): SubCommand;
-}
-export interface ISubCommandGroup extends ISlash {
+    addSubCommand(data: SubCommand | Discord.ApplicationCommandData): SubCommand;
+    /**
+        * Converts it into a Discord.ApplicationCommandData Object
+    */
+    convert(): Discord.ApplicationCommandData;
 }
 /**
     * Represents a Sub Command Group
 */
+export interface ISubCommandGroup extends Discord.ApplicationCommandData {
+    readonly type: number;
+}
 export declare class SubCommandGroup extends Slash {
     readonly type: number;
 }

@@ -1,65 +1,61 @@
 // Dependencies
-import { REST } from '@discordjs/rest';
-import { Routes } from 'discord-api-types/v9';
+import Discord, { ApplicationCommandOptionType, Snowflake } from "discord.js"
+import { ApplicationCommandOptionTypes } from "discord.js/typings/enums";
 
-//
+/**
+    * Removes all the registered slash commands. Make sure your bot is ready first
+    * @param {Discord.Client} Client - Your bot client
+*/
+export async function removeAllSlashCommands(Client: Discord.Client, guildId?: string){
+    // Make sure the client is ready
+    if (!Client.isReady()){
+        let error = new Error("Client is not ready yet")
+        throw(error)
+    }
+    
+    //
+    let CommandManager = Client.application.commands
+    CommandManager.cache.forEach((Command) => {
+        CommandManager.delete(Command, guildId)
+    })
+}
+
 /**
     * Refreshes all of your (/) commands, making them appear in Discord
-    * @param token The token of your bot
-    * @param clientId The Client Id of your bot
-    * @param guildId The Guild Id of where you want your commands to appear
-    * @param allSlashCommands An array with all of the slash commands
+    * @param {Discord.Client} Client - Your bot client
+    * @param {Slash[]} allSlashCommands - An array with all of the slash commands
+    * @param {Snowflake} guildId - The guild id you only want to initialise these commands in
 */
-export async function initialise(token: string, clientId: string, guildId: string, allSlashCommands: Slash[]) {
-    // Vars
-    const rest = new REST({ version: '9' }).setToken(token)
+export async function initialise(Client: Discord.Client, allSlashCommands: Slash[], guildId?: Snowflake) {
+    // Make sure the client is ready
+    if (!Client.isReady()){
+        let error = new Error("Client is not ready yet")
+        throw(error)
+    }
 
     //
-    try {
-        console.log("Started refreshing application (/) commands")
-
-        await rest.put(
-            Routes.applicationGuildCommands(clientId, guildId),
-            { body: allSlashCommands }
-        )
-
-        console.log("Sucessfully reloaded application (/) commands")
-    } catch (error) {
-        console.log(error)
+    let CommandManager = Client.application.commands
+    for (const SlashCommand of allSlashCommands){
+        if (guildId){
+            await CommandManager.create(SlashCommand.convert(), guildId)
+        } else {
+            await CommandManager.create(SlashCommand.convert())
+        }
+        
     }
 }
 
-/**
-    * All of the types of options
-*/
-export enum OptionType {
-    SUB_COMMAND = 1,
-    SUB_COMMAND_GROUP = 2,
-    STRING = 3,
-    INTEGER = 4,
-    BOOLEAN = 5,
-    USER = 6,
-    CHANNEL = 7,
-    ROLE = 8,
-    MENTIONABLE = 9,
-    NUMBER = 10
-}
-
 // Choices
-export interface IChoice {
-    name: string
-    value: string
-}
 /**
     * Represents a Choice
 */
 export class Choice {
     // Vars
     name: string
-    value: string
+    value: string | number
 
     // Constructor
-    constructor(data: IChoice) {
+    constructor(data: Discord.ApplicationCommandOptionChoice) {
         this.name = data.name
         this.value = data.value
     }
@@ -80,14 +76,6 @@ export class Choice {
 }
 
 // Options
-export interface IOption {
-    name: string
-    description: string
-    type: OptionType
-    required?: boolean
-    choices?: Choice[]
-    options?: IOption[]
-}
 /**
     * Represents an Option
 */
@@ -95,24 +83,31 @@ export class Option {
     // Vars
     name: string
     description: string
-    type: OptionType
+    type: ApplicationCommandOptionType | ApplicationCommandOptionTypes
     required?: boolean
     choices?: Choice[]
     options?: Option[]
 
     // Constructor
-    constructor(data: IOption) {
+    constructor(data: Discord.ApplicationCommandOptionData) {
         this.name = data.name
         this.description = data.description
         this.type = data.type
         this.required = data.required
-        this.choices = data.choices
 
         // Check if options was given
         if (data.options) {
             this.options = []
             for (let option of data.options) {
                 this.options.push(new Option(option))
+            }
+        }
+
+        // Check if choices was given
+        if (data.choices){
+            this.choices = []
+            for (let choice of data.choices){
+                this.choices.push(new Choice(choice))
             }
         }
     }
@@ -134,7 +129,7 @@ export class Option {
     /**
         * Set the type of the Option
     */
-    setType(type: OptionType) {
+    setType(type: ApplicationCommandOptionTypes) {
         this.type = type
     }
 
@@ -162,7 +157,7 @@ export class Option {
     /**
         * Add an option to the pre-existing options
     */
-    addOption(data: Option | IOption) {
+    addOption(data: Option | Discord.ApplicationCommandOptionData) {
         // Make sure there is an option array
         if (!this.options) {
             this.options = []
@@ -183,7 +178,7 @@ export class Option {
     /**
         * Add a choice to the pre-existing choices
     */
-    addChoice(data: Choice | IChoice) {
+    addChoice(data: Choice | Discord.ApplicationCommandOptionChoice) {
         // Make sure there is a choice array
         if (!this.choices) {
             this.choices = []
@@ -205,24 +200,18 @@ export class Option {
     }
 }
 
-// SubCommand
-export interface ISubCommand {
-    name: string
-    description?: string
-    options?: Option[]
-}
 /**
     * Represents a Sub Command
 */
 export class SubCommand {
     // Vars
     name: string
-    description?: string
-    readonly type: OptionType = OptionType.SUB_COMMAND
+    description: string
+    readonly type: ApplicationCommandOptionTypes = ApplicationCommandOptionTypes.SUB_COMMAND
     options?: (Option)[]
 
     // Constructor
-    constructor(data: ISubCommand) {
+    constructor(data: Discord.ApplicationCommandData) {
         this.name = data.name
         this.description = data.description
 
@@ -259,7 +248,7 @@ export class SubCommand {
     /**
         * Add an option to the existing options of the Sub Command
     */
-    addOption(data: Option | IOption) {
+    addOption(data: Option | Discord.ApplicationCommandOptionData) {
         // Make sure there is an option array
         if (!this.options) {
             this.options = []
@@ -282,22 +271,18 @@ export class SubCommand {
 }
 
 // Slash
-export interface ISlash {
-    name: string
-    description?: string
-    options?: (Option | SubCommand | SubCommandGroup)[]
-}
 /**
     * Represents a Slash Command
 */
 export default class Slash {
     // Vars
     name: string
-    description?: string
-    options?: (Option | SubCommand | SubCommandGroup)[]
+    description: string
+    options?: (Discord.ApplicationCommandOptionData)[]
+    defaultPermissions?: boolean
 
     // Constructor
-    constructor(data: ISlash) {
+    constructor(data: Discord.ApplicationCommandData) {
         this.name = data.name
         this.description = data.description
 
@@ -340,7 +325,7 @@ export default class Slash {
     /**
         * Adds an options to the existing options of the Slash Command
     */
-    addOption(data: Option | IOption) {
+    addOption(data: Option | Discord.ApplicationCommandOptionData) {
         // Make sure there is an option array
         if (!this.options) {
             this.options = []
@@ -364,7 +349,7 @@ export default class Slash {
     /**
         * Creates a Sub Command Group and adds it to the Slash Command
     */
-    addSubCommandGroup(data: SubCommandGroup | ISubCommandGroup) {
+    addSubCommandGroup(data: SubCommandGroup | Discord.ApplicationCommandData) {
         // Make sure there is an option array
         if (!this.options) {
             this.options = []
@@ -388,7 +373,7 @@ export default class Slash {
     /**
         * Creates a Sub Command and adds it to the Slash Command
     */
-    addSubCommand(data: SubCommand | ISubCommand) {
+    addSubCommand(data: SubCommand | Discord.ApplicationCommandData) {
         // Make sure there is an option array
         if (!this.options) {
             this.options = []
@@ -408,14 +393,22 @@ export default class Slash {
         // Return the subCommand
         return subCommand
     }
-}
 
-// SubCommandGroup
-export interface ISubCommandGroup extends ISlash { }
+    /**
+        * Converts it into a Discord.ApplicationCommandData Object
+    */
+    convert(){
+        let Object = JSON.parse(JSON.stringify(this))
+        return <Discord.ApplicationCommandData>Object
+    }
+}
 
 /**
     * Represents a Sub Command Group
 */
+export interface ISubCommandGroup extends Discord.ApplicationCommandData {
+    readonly type: number
+}
 export class SubCommandGroup extends Slash {
-    readonly type: number = OptionType.SUB_COMMAND_GROUP
+    readonly type: number = ApplicationCommandOptionTypes.SUB_COMMAND_GROUP
 }

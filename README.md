@@ -1,2 +1,2 @@
 # discord-slashtypes
-Includes typings for discord.js v13 slash commands.
+This package makes slash commands easier by adding classes for each one

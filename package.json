@@ -1,7 +1,7 @@
 {
   "name": "discord-slashtypes",
-  "version": "1.1.1",
-  "description": "Includes typings for discord.js v13 slash commands.",
+  "version": "1.1.2",
+  "description": "Classes for discord.js v13 application commands.",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
   "scripts": {
@@ -18,7 +18,11 @@
     "slash",
     "command",
     "commands",
-    "types"
+    "types",
+    "classes",
+    "application",
+    "type",
+    "class"
   ],
   "author": "Stefanuk12",
   "license": "MIT",

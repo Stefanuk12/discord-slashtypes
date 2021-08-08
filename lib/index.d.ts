@@ -41,7 +41,7 @@ export declare class Permission {
         * @param {Discord.Client} Client - Your bot client
         * @param {Slash | SubCommand} Command - The command to add the permissions too
     */
-    add(Client: Discord.Client, Command: Slash | SubCommand): Promise<void>;
+    add(Client: Discord.Client, Command: Slash | SubCommand): Promise<Discord.ApplicationCommandPermissions[]>;
     /**
         @returns {ApplicationCommandPermissionData} Converted Permission Class to ApplicationCommandPermissionData Object
     */
@@ -139,6 +139,10 @@ export declare class SubCommand {
     resolve(Client: Discord.Client): Promise<Discord.ApplicationCommand<{
         guild: Discord.GuildResolvable;
     }> | undefined>;
+    /**
+        * Set the permissions
+    */
+    setPermission(Client: Discord.Client, permission: Permission): Promise<this>;
 }
 /**
     * Represents a Slash Command
@@ -184,6 +188,10 @@ export default class Slash {
     resolve(Client: Discord.Client): Promise<Discord.ApplicationCommand<{
         guild: Discord.GuildResolvable;
     }> | undefined>;
+    /**
+        * Set the permissions
+    */
+    setPermission(Client: Discord.Client, permission: Permission): Promise<this>;
 }
 /**
     * Represents a Sub Command Group

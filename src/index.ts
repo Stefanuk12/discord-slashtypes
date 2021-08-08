@@ -111,7 +111,7 @@ export class Permission {
 
         //
         let permission = this.convert()
-        command.permissions.add({
+        return command.permissions.add({
             guild: command.guild,
             permissions: [
                 permission
@@ -402,6 +402,17 @@ export class SubCommand {
         //
         return Command
     }
+
+    /**
+        * Set the permissions
+    */
+    async setPermission(Client: Discord.Client, permission: Permission){
+        // Set the permission
+        await permission.add(Client, this)
+
+        // Return
+        return this
+    }
 }
 
 // Slash
@@ -570,6 +581,17 @@ export default class Slash {
         
         //
         return Command
+    }
+
+    /**
+        * Set the permissions
+    */
+    async setPermission(Client: Discord.Client, permission: Permission){
+        // Set the permission
+        await permission.add(Client, this)
+
+        // Return
+        return this
     }
 }
 

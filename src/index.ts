@@ -57,8 +57,6 @@ export async function initialise(Client: Discord.Client, allSlashCommands: Slash
         } else {
             result = await CommandManager.create(SlashCommand.convert())
         }
-        
-        SlashCommand.id = result.id
     }
 }
 
@@ -303,7 +301,6 @@ export class Option {
 */
 export class SubCommand {
     // Vars
-    id?: Snowflake
     name: string
     description: string
     readonly type: ApplicationCommandOptionTypes = ApplicationCommandOptionTypes.SUB_COMMAND
@@ -383,18 +380,13 @@ export class SubCommand {
         }
 
         //
-        let Commands = await Client.application.commands.fetch(this.id)
+        let Commands = await Client.application.commands.fetch()
         let Command
 
         // Check type
         if (Commands instanceof Collection){
             // Find the command
             Command = Commands.find(command => command.name === this.name && command.description === this.description && command.options == this.options)
-            
-            // Set id
-            if (Command){
-                this.id = Command.id
-            }
         } else {
             Command = Commands
         }
@@ -421,7 +413,6 @@ export class SubCommand {
 */
 export default class Slash {
     // Vars
-    id?: Snowflake
     name: string
     description: string
     options?: (Discord.ApplicationCommandOptionData)[]
@@ -563,18 +554,13 @@ export default class Slash {
         }
 
         //
-        let Commands = await Client.application.commands.fetch(this.id)
+        let Commands = await Client.application.commands.fetch()
         let Command
 
         // Check type
         if (Commands instanceof Collection){
             // Find the command
             Command = Commands.find(command => command.name === this.name && command.description === this.description && command.options == this.options)
-            
-            // Set id
-            if (Command){
-                this.id = Command.id
-            }
         } else {
             Command = Commands
         }

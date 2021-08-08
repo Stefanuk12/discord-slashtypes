@@ -111,7 +111,6 @@ export declare class Option {
     * Represents a Sub Command
 */
 export declare class SubCommand {
-    id?: Snowflake;
     name: string;
     description: string;
     readonly type: ApplicationCommandOptionTypes;
@@ -148,7 +147,6 @@ export declare class SubCommand {
     * Represents a Slash Command
 */
 export default class Slash {
-    id?: Snowflake;
     name: string;
     description: string;
     options?: (Discord.ApplicationCommandOptionData)[];

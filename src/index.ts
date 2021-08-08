@@ -422,7 +422,7 @@ export default class Slash {
     name: string
     description: string
     options?: (Discord.ApplicationCommandOptionData)[]
-    defaultPermissions?: boolean
+    defaultPermissions: boolean = false // to avoid permission stuff
 
     // Constructor
     constructor(data: Discord.ApplicationCommandData) {

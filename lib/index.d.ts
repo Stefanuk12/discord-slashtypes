@@ -152,7 +152,7 @@ export default class Slash {
     name: string;
     description: string;
     options?: (Discord.ApplicationCommandOptionData)[];
-    defaultPermissions?: boolean;
+    defaultPermissions: boolean;
     constructor(data: Discord.ApplicationCommandData);
     /**
         * Sets the name of the Slash Command

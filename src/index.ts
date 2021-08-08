@@ -1,5 +1,5 @@
 // Dependencies
-import Discord, { ApplicationCommandOptionType, Snowflake } from "discord.js"
+import Discord, { ApplicationCommandOptionType, ApplicationCommandPermissionData, Collection, Snowflake } from "discord.js"
 
 //
 export enum ApplicationCommandOptionTypes {
@@ -50,16 +50,89 @@ export async function initialise(Client: Discord.Client, allSlashCommands: Slash
     //
     let CommandManager = Client.application.commands
     for (const SlashCommand of allSlashCommands){
+        let result
+
         if (guildId){
-            await CommandManager.create(SlashCommand.convert(), guildId)
+            result = await CommandManager.create(SlashCommand.convert(), guildId)
         } else {
-            await CommandManager.create(SlashCommand.convert())
+            result = await CommandManager.create(SlashCommand.convert())
         }
         
+        SlashCommand.id = result.id
     }
 }
 
-// Choices
+enum ApplicationCommandPermissionTypes {
+    ROLE = 1,
+    USER = 2
+}
+/**
+    * Represents a permission
+*/
+export class Permission {
+    // Vars
+    id: Snowflake
+    type: Discord.ApplicationCommandPermissionType | ApplicationCommandPermissionTypes
+    permission: boolean
+
+    // Constructor
+    constructor(data: Discord.ApplicationCommandPermissionData){
+        this.id = data.id
+        this.type = data.type
+        this.permission = data.permission
+    }
+
+    /**
+        * Sets the permissions for the command
+        * @param {Discord.Client} Client - Your bot client
+        * @param {Slash | SubCommand} Command - The command to add the permissions too
+    */
+    async add(Client: Discord.Client, Command: Slash | SubCommand){
+        // Make sure client is ready
+        if (!Client.isReady()){
+            let error = new Error("Client is not ready yet")
+            throw(error)
+        }
+
+        //
+        let command = await Command.resolve(Client)
+        
+        //
+        if (!command){
+            let error = new Error("Could not resolve command")
+            throw(error)
+        }
+
+        //
+        if (!command.guild){
+            let error = new Error("Could not resolve command guild")
+            throw(error)
+        }
+
+        //
+        let permission = this.convert()
+        command.permissions.add({
+            guild: command.guild,
+            permissions: [
+                permission
+            ]
+        })
+    }
+
+    /**
+        @returns {ApplicationCommandPermissionData} Converted Permission Class to ApplicationCommandPermissionData Object
+    */
+    convert(): ApplicationCommandPermissionData{
+        let object = {
+            id: this.id,
+            type: this.type,
+            permission: this.permission
+        }
+
+        return <ApplicationCommandPermissionData>object
+    }
+}
+
 /**
     * Represents a Choice
 */
@@ -230,6 +303,7 @@ export class Option {
 */
 export class SubCommand {
     // Vars
+    id?: Snowflake
     name: string
     description: string
     readonly type: ApplicationCommandOptionTypes = ApplicationCommandOptionTypes.SUB_COMMAND
@@ -297,6 +371,37 @@ export class SubCommand {
             return this
         }
     }
+
+    /**
+        * Resolves SubCommand to one from the Discord.js thing 
+    */
+    async resolve(Client: Discord.Client){
+        // Make sure the client is ready
+        if (!Client.isReady()){
+            let error = new Error("Client is not ready yet")
+            throw(error)
+        }
+
+        //
+        let Commands = await Client.application.commands.fetch(this.id)
+        let Command
+
+        // Check type
+        if (Commands instanceof Collection){
+            // Find the command
+            Command = Commands.find(command => command.name === this.name && command.description === this.description && command.options == this.options)
+            
+            // Set id
+            if (Command){
+                this.id = Command.id
+            }
+        } else {
+            Command = Commands
+        }
+        
+        //
+        return Command
+    }
 }
 
 // Slash
@@ -305,6 +410,7 @@ export class SubCommand {
 */
 export default class Slash {
     // Vars
+    id?: Snowflake
     name: string
     description: string
     options?: (Discord.ApplicationCommandOptionData)[]
@@ -433,6 +539,37 @@ export default class Slash {
     convert(){
         let Object = JSON.parse(JSON.stringify(this))
         return <Discord.ApplicationCommandData>Object
+    }
+
+    /**
+        * Resolves SubCommand to one from the Discord.js thing 
+    */
+    async resolve(Client: Discord.Client){
+        // Make sure the client is ready
+        if (!Client.isReady()){
+            let error = new Error("Client is not ready yet")
+            throw(error)
+        }
+
+        //
+        let Commands = await Client.application.commands.fetch(this.id)
+        let Command
+
+        // Check type
+        if (Commands instanceof Collection){
+            // Find the command
+            Command = Commands.find(command => command.name === this.name && command.description === this.description && command.options == this.options)
+            
+            // Set id
+            if (Command){
+                this.id = Command.id
+            }
+        } else {
+            Command = Commands
+        }
+        
+        //
+        return Command
     }
 }
 

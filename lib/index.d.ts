@@ -1,4 +1,4 @@
-import Discord, { ApplicationCommandOptionType, Snowflake } from "discord.js";
+import Discord, { ApplicationCommandOptionType, ApplicationCommandPermissionData, Snowflake } from "discord.js";
 export declare enum ApplicationCommandOptionTypes {
     SUB_COMMAND = 1,
     SUB_COMMAND_GROUP = 2,
@@ -24,6 +24,29 @@ export declare function removeAllSlashCommands(Client: Discord.Client, guildId?:
     * @param {Snowflake} guildId - The guild id you only want to initialise these commands in
 */
 export declare function initialise(Client: Discord.Client, allSlashCommands: Slash[], guildId?: Snowflake): Promise<void>;
+declare enum ApplicationCommandPermissionTypes {
+    ROLE = 1,
+    USER = 2
+}
+/**
+    * Represents a permission
+*/
+export declare class Permission {
+    id: Snowflake;
+    type: Discord.ApplicationCommandPermissionType | ApplicationCommandPermissionTypes;
+    permission: boolean;
+    constructor(data: Discord.ApplicationCommandPermissionData);
+    /**
+        * Sets the permissions for the command
+        * @param {Discord.Client} Client - Your bot client
+        * @param {Slash | SubCommand} Command - The command to add the permissions too
+    */
+    add(Client: Discord.Client, Command: Slash | SubCommand): Promise<void>;
+    /**
+        @returns {ApplicationCommandPermissionData} Converted Permission Class to ApplicationCommandPermissionData Object
+    */
+    convert(): ApplicationCommandPermissionData;
+}
 /**
     * Represents a Choice
 */
@@ -82,12 +105,13 @@ export declare class Option {
     /**
         * Add a choice to the pre-existing choices
     */
-    addChoice(data: Choice | Discord.ApplicationCommandOptionChoice, returnChoice?: boolean): Choice | this;
+    addChoice(data: Choice | Discord.ApplicationCommandOptionChoice, returnChoice?: boolean): this | Choice;
 }
 /**
     * Represents a Sub Command
 */
 export declare class SubCommand {
+    id?: Snowflake;
     name: string;
     description: string;
     readonly type: ApplicationCommandOptionTypes;
@@ -108,12 +132,19 @@ export declare class SubCommand {
     /**
         * Add an option to the existing options of the Sub Command
     */
-    addOption(data: Option | Discord.ApplicationCommandOptionData, returnOption?: boolean): Option | this;
+    addOption(data: Option | Discord.ApplicationCommandOptionData, returnOption?: boolean): this | Option;
+    /**
+        * Resolves SubCommand to one from the Discord.js thing
+    */
+    resolve(Client: Discord.Client): Promise<Discord.ApplicationCommand<{
+        guild: Discord.GuildResolvable;
+    }> | undefined>;
 }
 /**
     * Represents a Slash Command
 */
 export default class Slash {
+    id?: Snowflake;
     name: string;
     description: string;
     options?: (Discord.ApplicationCommandOptionData)[];
@@ -147,6 +178,12 @@ export default class Slash {
         * Converts it into a Discord.ApplicationCommandData Object
     */
     convert(): Discord.ApplicationCommandData;
+    /**
+        * Resolves SubCommand to one from the Discord.js thing
+    */
+    resolve(Client: Discord.Client): Promise<Discord.ApplicationCommand<{
+        guild: Discord.GuildResolvable;
+    }> | undefined>;
 }
 /**
     * Represents a Sub Command Group
@@ -157,4 +194,5 @@ export interface ISubCommandGroup extends Discord.ApplicationCommandData {
 export declare class SubCommandGroup extends Slash {
     readonly type: number;
 }
+export {};
 //# sourceMappingURL=index.d.ts.map

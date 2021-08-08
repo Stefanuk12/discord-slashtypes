@@ -49,6 +49,7 @@ export async function initialise(Client: Discord.Client, allSlashCommands: Slash
 
     //
     let CommandManager = Client.application.commands
+    let Commands = []
     for (const SlashCommand of allSlashCommands){
         let result
 
@@ -57,7 +58,12 @@ export async function initialise(Client: Discord.Client, allSlashCommands: Slash
         } else {
             result = await CommandManager.create(SlashCommand.convert())
         }
+
+        Commands.push(result)
     }
+
+    //
+    return Commands
 }
 
 enum ApplicationCommandPermissionTypes {

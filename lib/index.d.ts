@@ -23,7 +23,9 @@ export declare function removeAllSlashCommands(Client: Discord.Client, guildId?:
     * @param {Slash[]} allSlashCommands - An array with all of the slash commands
     * @param {Snowflake} guildId - The guild id you only want to initialise these commands in
 */
-export declare function initialise(Client: Discord.Client, allSlashCommands: Slash[], guildId?: Snowflake): Promise<void>;
+export declare function initialise(Client: Discord.Client, allSlashCommands: Slash[], guildId?: Snowflake): Promise<Discord.ApplicationCommand<{
+    guild: Discord.GuildResolvable;
+}>[]>;
 declare enum ApplicationCommandPermissionTypes {
     ROLE = 1,
     USER = 2
